@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/Tesorp1X/goprojects/01-todo-list/internal/models"
@@ -91,7 +92,20 @@ func NewCsvStorage(file *os.File, settings *models.Settings) (*CsvStorage, error
 	return &CsvStorage{storageFile: file, rawData: data, appSettings: settings}, nil
 }
 
+// Save method saves a new task Note and writes it to the CSV file.
 func (s *CsvStorage) Save(taskStr string) error {
+	writer := csv.NewWriter(s.storageFile)
+	defer writer.Flush()
+
+	newId, _ := s.GetLastId()
+	newId++
+	newIdStr := strconv.FormatInt(int64(newId), 10)
+	timeStr := time.Now().String()
+	statusStr := strconv.FormatBool(false)
+	newLine := []string{newIdStr, taskStr, timeStr, statusStr}
+
+	s.rawData = append(s.rawData, newLine)
+	writer.Write(newLine)
 	return nil
 }
 

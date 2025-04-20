@@ -107,6 +107,5 @@ func (s *CsvStorage) AlterNote(newNote Note) error {
 }
 
 func (s *CsvStorage) GetLastId() (int, error) {
-
-	return -1, nil
+	return len(s.rawData) - 1, nil
 }

@@ -45,6 +45,22 @@ func (n Note) IsClosed() bool {
 	return n.isClosed
 }
 
+func (n *Note) SetId(id int) {
+	n.id = id
+}
+
+func (n *Note) SetData(taskStr string) {
+	n.data = taskStr
+}
+
+func (n *Note) SetTime(newTime time.Time) {
+	n.timeStamp = newTime
+}
+
+func (n *Note) SetStatus(status bool) {
+	n.isClosed = status
+}
+
 // CsvStorage is a tool to manage '.csv' storage.
 // Create only via NewCsvStorage!
 // Implements Storage interface.

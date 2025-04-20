@@ -14,7 +14,7 @@ type Storage interface {
 	GetNote(int) (*Note, error)
 	GetNotesList() ([]Note, error)
 	DeleteNote(int) error
-	AlterNote(int, Note)
+	AlterNote(Note) error
 	GetLastId() (int, error)
 }
 
@@ -47,6 +47,7 @@ func (n Note) IsClosed() bool {
 
 // CsvStorage is a tool to manage '.csv' storage.
 // Create only via NewCsvStorage!
+// Implements Storage interface.
 type CsvStorage struct {
 	storageFile *os.File
 	rawData     [][]string // matrix with all csv data in it
@@ -62,4 +63,28 @@ func NewCsvStorage(file *os.File, settings *models.Settings) (*CsvStorage, error
 	}
 
 	return &CsvStorage{storageFile: file, rawData: data, appSettings: settings}, nil
+}
+
+func (s *CsvStorage) Save(taskStr string) error {
+	return nil
+}
+
+func (s *CsvStorage) GetNote(noteId int) (*Note, error) {
+	return nil, nil
+}
+
+func (s *CsvStorage) GetNotesList() ([]Note, error) {
+	return nil, nil
+}
+
+func (s *CsvStorage) DeleteNote(noteId int) error {
+	return nil
+}
+
+func (s *CsvStorage) AlterNote(newNote Note) error {
+	return nil
+}
+
+func (s *CsvStorage) GetLastId() (int, error) {
+	return -1, nil
 }

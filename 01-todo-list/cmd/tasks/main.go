@@ -6,19 +6,9 @@ import (
 	"os"
 
 	"github.com/Tesorp1X/goprojects/01-todo-list/internal/commands"
+	"github.com/Tesorp1X/goprojects/01-todo-list/internal/models"
+	"github.com/Tesorp1X/goprojects/01-todo-list/internal/storage"
 )
-
-type Settings struct {
-	OutFile *os.File
-	ErrFile *os.File
-	Logger  *log.Logger
-}
-
-func InitSettings(outF, errF *os.File, log *log.Logger) *Settings {
-	return &Settings{OutFile: outF, ErrFile: errF, Logger: log}
-}
-
-var APP_SETTINGS *Settings
 
 const (
 	STD_STORAGE_FILE_DIR  = "/storage/"
@@ -41,26 +31,29 @@ func main() {
 	logger := log.New(logFile, LOG_MSG_PREFIX, log.Ldate|log.Ltime)
 
 	//Init  Settings
-	APP_SETTINGS = InitSettings(os.Stdout, os.Stderr, logger)
+	appSettings := models.InitSettings(os.Stdout, os.Stderr, logger)
 
 	//Init storage
 	storageFile, err := os.Open(STD_STORAGE_FILE_DIR + STD_STORAGE_FILE_NAME + CSV_FILE_SUFFIX)
 	if err != nil {
-		fmt.Fprintln(APP_SETTINGS.ErrFile, "Storage file is missing")
+		fmt.Fprintln(appSettings.ErrFile, "Storage file is missing")
 	}
 	defer storageFile.Close()
-
+	csvStorage, errStorage := storage.NewCsvStorage(storageFile, appSettings)
+	if errStorage != nil {
+		panic(errStorage)
+	}
 	//Parse command
 	command := args[1]
 	switch command {
 	case "add":
 		taskStr := "task"
-		commands.AddCommand(taskStr)
+		commands.AddCommand(csvStorage, taskStr)
 	case "list":
-		commands.ListCommand()
+		commands.ListCommand(csvStorage)
 	case "complete":
 		taskId := 1
-		commands.CompleteCommand(taskId)
+		commands.CompleteCommand(csvStorage, taskId)
 	default:
 		fmt.Fprintf(os.Stderr, "Error: unknown command %s", command)
 	}

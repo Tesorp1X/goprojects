@@ -25,6 +25,11 @@ type Note struct {
 	isClosed  bool
 }
 
+// NewNoteWithId is a Note constructor. Creates a Note object with given id.
+func NewNoteWithId(id int, taskStr string) *Note {
+	return &Note{id: id, data: taskStr, timeStamp: time.Now(), isClosed: false}
+}
+
 func (n *Note) Close() {
 	n.isClosed = false
 }

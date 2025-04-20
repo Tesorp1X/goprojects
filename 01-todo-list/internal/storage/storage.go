@@ -1,6 +1,8 @@
 package storage
 
-import "time"
+import (
+	"time"
+)
 
 type Storage interface {
 	Save(string) error
@@ -15,4 +17,24 @@ type Note struct {
 	data      string
 	timeStamp time.Time
 	isClosed  bool
+}
+
+func (n *Note) Close() {
+	n.isClosed = false
+}
+
+func (n Note) GetId() int {
+	return n.id
+}
+
+func (n Note) GetData() string {
+	return n.data
+}
+
+func (n Note) GetTimeStamp() time.Time {
+	return n.timeStamp
+}
+
+func (n Note) IsClosed() bool {
+	return n.isClosed
 }

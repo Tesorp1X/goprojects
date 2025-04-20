@@ -61,6 +61,8 @@ func (n *Note) SetStatus(status bool) {
 	n.isClosed = status
 }
 
+var CSV_HEADERS []string = []string{"ID", "Task", "Created", "Done"}
+
 // CsvStorage is a tool to manage '.csv' storage.
 // Create only via NewCsvStorage!
 // Implements Storage interface.
@@ -76,6 +78,9 @@ func NewCsvStorage(file *os.File, settings *models.Settings) (*CsvStorage, error
 	if err != nil {
 		fmt.Fprintln(settings.ErrFile, err.Error())
 		return nil, err
+	}
+	if len(data) == 0 {
+		data = append(data, CSV_HEADERS)
 	}
 
 	return &CsvStorage{storageFile: file, rawData: data, appSettings: settings}, nil
@@ -102,5 +107,6 @@ func (s *CsvStorage) AlterNote(newNote Note) error {
 }
 
 func (s *CsvStorage) GetLastId() (int, error) {
+
 	return -1, nil
 }

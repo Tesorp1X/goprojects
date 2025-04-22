@@ -2,6 +2,7 @@ package storage
 
 import (
 	"encoding/csv"
+	"errors"
 	"fmt"
 	"os"
 	"strconv"
@@ -26,9 +27,20 @@ type Note struct {
 	isClosed  bool
 }
 
-// NewNoteWithId is a Note constructor. Creates a Note object with given id.
-func NewNoteWithId(id int, taskStr string) *Note {
-	return &Note{id: id, data: taskStr, timeStamp: time.Now(), isClosed: false}
+// CreateNewNoteWithId is a Note constructor. Creates a Note object with given id.
+func CreateNewNoteWithId(id int, taskStr string, timeStamp time.Time, status bool) *Note {
+	return &Note{id: id, data: taskStr, timeStamp: timeStamp, isClosed: status}
+}
+
+func NewNoteFromRawData(rawData []string) (*Note, error) {
+	id, errId := strconv.ParseInt(rawData[0], 10, 0)
+	data := rawData[1]
+	timeStamp, errTime := time.Parse(models.TimeFormat, rawData[2])
+	status, errStatus := strconv.ParseBool(rawData[3])
+	if errId != nil && errTime != nil && errStatus != nil {
+		return nil, errors.New(models.WrongNoteDataError)
+	}
+	return CreateNewNoteWithId(int(id), data, timeStamp, status), nil
 }
 
 func (n *Note) Close() {
@@ -100,7 +112,7 @@ func (s *CsvStorage) Save(taskStr string) error {
 	newId, _ := s.GetLastId()
 	newId++
 	newIdStr := strconv.FormatInt(int64(newId), 10)
-	timeStr := time.Now().String()
+	timeStr := time.Now().Format(models.TimeFormat)
 	statusStr := strconv.FormatBool(false)
 	newLine := []string{newIdStr, taskStr, timeStr, statusStr}
 
@@ -110,7 +122,11 @@ func (s *CsvStorage) Save(taskStr string) error {
 }
 
 func (s *CsvStorage) GetNote(noteId int) (*Note, error) {
-	return nil, nil
+	if noteId >= len(s.rawData) {
+		return nil, errors.New(models.IdOutOfRangeError)
+	}
+
+	return NewNoteFromRawData(s.rawData[noteId-1])
 }
 
 func (s *CsvStorage) GetNotesList() ([]Note, error) {

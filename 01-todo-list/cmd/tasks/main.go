@@ -11,10 +11,10 @@ import (
 )
 
 const (
-	STD_STORAGE_FILE_DIR  = "/storage/"
+	STD_STORAGE_FILE_DIR  = "./storage/"
 	STD_STORAGE_FILE_NAME = "tasks"
 	CSV_FILE_SUFFIX       = ".csv"
-	STD_LOG_FILE_NAME     = "/log/tasks.log"
+	STD_LOG_FILE_NAME     = "./log/tasks.log"
 	LOG_MSG_PREFIX        = "INFO: "
 )
 
@@ -23,7 +23,8 @@ func main() {
 
 	//TODO flags
 	//Init logger
-	logFile, errLog := os.Open(STD_LOG_FILE_NAME)
+	logFile, errLog := os.OpenFile(STD_LOG_FILE_NAME, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+
 	if errLog != nil {
 		panic("Log file is missing.")
 	}
@@ -34,7 +35,9 @@ func main() {
 	appSettings := models.InitSettings(os.Stdout, os.Stderr, logger)
 
 	//Init storage
-	storageFile, err := os.Open(STD_STORAGE_FILE_DIR + STD_STORAGE_FILE_NAME + CSV_FILE_SUFFIX)
+	storageFile, err := os.OpenFile(STD_STORAGE_FILE_DIR+STD_STORAGE_FILE_NAME+CSV_FILE_SUFFIX,
+		os.O_APPEND|os.O_CREATE|os.O_RDWR, 0644)
+
 	if err != nil {
 		fmt.Fprintln(appSettings.ErrFile, "Storage file is missing")
 	}

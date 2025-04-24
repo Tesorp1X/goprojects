@@ -99,12 +99,19 @@ func NewCsvStorage(file *os.File, settings *models.Settings) (*CsvStorage, error
 	}
 	if len(data) == 0 {
 		data = append(data, CSV_HEADERS)
+		w := csv.NewWriter(file)
+		if err := w.Write(CSV_HEADERS); err != nil {
+			return nil, err
+		}
+		w.Flush()
+
 	}
 
 	return &CsvStorage{storageFile: file, rawData: data, appSettings: settings}, nil
 }
 
 // Save method saves a new task Note and writes it to the CSV file.
+// Returns whatever error occured during [WriteAll] method call.
 func (s *CsvStorage) Save(taskStr string) error {
 	writer := csv.NewWriter(s.storageFile)
 	defer writer.Flush()
@@ -117,8 +124,8 @@ func (s *CsvStorage) Save(taskStr string) error {
 	newLine := []string{newIdStr, taskStr, timeStr, statusStr}
 
 	s.rawData = append(s.rawData, newLine)
-	writer.Write(newLine)
-	return nil
+	err := writer.Write(newLine)
+	return err
 }
 
 func (s *CsvStorage) GetNote(noteId int) (*Note, error) {

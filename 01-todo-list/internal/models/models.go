@@ -1,17 +1,17 @@
 package models
 
 import (
+	"io"
 	"log"
-	"os"
 )
 
 type Settings struct {
-	OutFile *os.File
-	ErrFile *os.File
+	OutFile io.Writer
+	ErrFile io.Writer
 	Logger  *log.Logger
 }
 
-func InitSettings(outF, errF *os.File, log *log.Logger) *Settings {
+func InitSettings(outF, errF io.Writer, log *log.Logger) *Settings {
 	return &Settings{OutFile: outF, ErrFile: errF, Logger: log}
 }
 

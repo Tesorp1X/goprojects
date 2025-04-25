@@ -50,15 +50,18 @@ func main() {
 	command := args[1]
 	switch command {
 	case "add":
+		//TODO parse taskStr
 		taskStr := "task"
 		commands.AddCommand(csvStorage, taskStr)
 	case "list":
+		//TODO parse -a
 		commands.ListCommand(csvStorage)
 	case "complete":
+		//TODO parse taskId
 		taskId := 1
 		commands.CompleteCommand(csvStorage, taskId)
 	default:
-		fmt.Fprintf(os.Stderr, "Error: unknown command %s", command)
+		fmt.Fprintf(appSettings.ErrFile, "Error: unknown command %s", command)
 	}
 
 }

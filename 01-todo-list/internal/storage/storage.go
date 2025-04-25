@@ -156,7 +156,7 @@ func (s *CsvStorage) GetNote(noteId int) (*Note, error) {
 func (s *CsvStorage) GetNotesList() ([]Note, error) {
 	var notes []Note
 
-	for _, line := range s.rawData {
+	for _, line := range s.rawData[1:] {
 		note, err := NewNoteFromRawData(line)
 		if err != nil {
 			return notes, err

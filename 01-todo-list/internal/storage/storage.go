@@ -152,8 +152,19 @@ func (s *CsvStorage) GetNote(noteId int) (*Note, error) {
 	return NewNoteFromRawData(s.rawData[noteId-1])
 }
 
+// Returns a slice of Note and any error, that NewNoteFromRawData produced.
 func (s *CsvStorage) GetNotesList() ([]Note, error) {
-	return nil, nil
+	var notes []Note
+
+	for _, line := range s.rawData {
+		note, err := NewNoteFromRawData(line)
+		if err != nil {
+			return notes, err
+		}
+		notes = append(notes, *note)
+	}
+
+	return notes, nil
 }
 
 func (s *CsvStorage) DeleteNote(noteId int) error {

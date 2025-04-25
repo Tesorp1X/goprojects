@@ -164,6 +164,14 @@ func (s *CsvStorage) AlterNote(newNote Note) error {
 	return nil
 }
 
+// Returns id of last Note, if Csv-file is empty, then method returns 0.
+// Returns [ErrSyntax] error, if last id is not int.
 func (s *CsvStorage) GetLastId() (int, error) {
-	return len(s.rawData) - 1, nil
+	if len(s.rawData) < 2 {
+		return 0, nil
+	}
+
+	lastId, err := strconv.ParseInt(s.rawData[len(s.rawData)-1][0], 10, 0)
+
+	return int(lastId), err
 }

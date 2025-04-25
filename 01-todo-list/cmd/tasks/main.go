@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/Tesorp1X/goprojects/01-todo-list/internal/commands"
 	"github.com/Tesorp1X/goprojects/01-todo-list/internal/models"
@@ -42,16 +43,18 @@ func main() {
 		fmt.Fprintln(appSettings.ErrFile, "Storage file is missing")
 	}
 	defer storageFile.Close()
+
 	csvStorage, errStorage := storage.NewCsvStorage(storageFile, appSettings)
 	if errStorage != nil {
 		panic(errStorage)
 	}
+
 	//Parse command
 	command := args[1]
 	switch command {
 	case "add":
 		//TODO parse taskStr
-		taskStr := "task"
+		taskStr := strings.Join(args[2:], " ")
 		commands.AddCommand(csvStorage, taskStr)
 	case "list":
 		//TODO parse -a

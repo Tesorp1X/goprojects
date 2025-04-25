@@ -88,6 +88,27 @@ type CsvStorage struct {
 	storageFile *os.File
 	rawData     [][]string // matrix with all csv data in it
 	appSettings *models.Settings
+	stagedData  []*Note // data to save. Must call .flush() to save it
+}
+
+func (s *CsvStorage) flush() error {
+	if len(s.stagedData) == 0 {
+		return nil
+	}
+	w := csv.NewWriter(s.storageFile)
+	defer w.Flush()
+	for _, note := range s.stagedData {
+		id := strconv.FormatInt(int64(note.id), 10)
+		timeStamp := note.timeStamp.Format(models.TimeFormat)
+		status := strconv.FormatBool(note.isClosed)
+
+		err := w.Write([]string{id, note.data, timeStamp, status})
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func NewCsvStorage(file *os.File, settings *models.Settings) (*CsvStorage, error) {

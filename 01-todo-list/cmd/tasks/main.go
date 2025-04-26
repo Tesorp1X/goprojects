@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/Tesorp1X/goprojects/01-todo-list/internal/commands"
@@ -73,8 +74,17 @@ func main() {
 		commands.ListCommand(csvStorage, allFlag)
 	case "complete":
 		//TODO parse taskId
-		taskId := 1
-		commands.CompleteCommand(csvStorage, taskId)
+		if len(args) < 3 {
+			fmt.Fprintln(appSettings.ErrFile, models.NoIdWasGivenError)
+			fmt.Fprintln(appSettings.OutFile, models.CompleteCommandHelp)
+			return
+		}
+		taskId, err := strconv.ParseInt(args[3], 10, 0)
+		if err != nil {
+			fmt.Println(appSettings.ErrFile, models.InvalidIdError)
+			return
+		}
+		commands.CompleteCommand(csvStorage, int(taskId))
 	default:
 		fmt.Fprintf(appSettings.ErrFile, "Error: unknown command %s", command)
 	}

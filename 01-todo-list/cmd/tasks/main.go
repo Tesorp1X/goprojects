@@ -53,22 +53,24 @@ func main() {
 	command := args[1]
 	switch command {
 	case "add":
+		//tasks.exe add <taskStr>
 		taskStr := strings.Join(args[2:], " ")
 		commands.AddCommand(csvStorage, taskStr)
 	case "list":
-		//TODO parse -a
+		//tasks.exe list
 		//tasks.exe list -a
+		//tasks.exe list --all
+		var allFlag bool
 		if len(args) > 2 {
 			flag := args[2]
 			switch flag {
-			case "-a":
-				commands.ListCommand(csvStorage, true)
-				return
+			case "-a", "--all":
+				allFlag = true
 			default:
 				fmt.Fprintf(appSettings.ErrFile, "invalid flag for 'list' %s", flag)
 			}
 		}
-		commands.ListCommand(csvStorage, false)
+		commands.ListCommand(csvStorage, allFlag)
 	case "complete":
 		//TODO parse taskId
 		taskId := 1

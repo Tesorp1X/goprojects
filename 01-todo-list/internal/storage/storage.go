@@ -144,12 +144,24 @@ func (s *CsvStorage) Save(taskStr string) error {
 	return s.flush()
 }
 
+func lookForId(data [][]string, id int) (found bool, noteRaw []string) {
+	for _, row := range data {
+		if rowId, _ := strconv.ParseInt(row[0], 10, 0); rowId == int64(id) {
+			found = true
+			noteRaw = row
+			return
+		}
+	}
+	return
+}
+
 func (s *CsvStorage) GetNote(noteId int) (*Note, error) {
-	if noteId >= len(s.rawData) {
+	found, noteRaw := lookForId(s.rawData, noteId)
+	if !found {
 		return nil, errors.New(models.IdOutOfRangeError)
 	}
 
-	return NewNoteFromRawData(s.rawData[noteId-1])
+	return NewNoteFromRawData(noteRaw)
 }
 
 // Returns a slice of Note and any error, that NewNoteFromRawData produced.

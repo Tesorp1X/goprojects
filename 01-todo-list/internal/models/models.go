@@ -23,4 +23,11 @@ const (
 const (
 	IdOutOfRangeError  = "error: given id is out range"
 	WrongNoteDataError = "error: couldn't create new note, because wrong data was given"
+	NoIdWasGivenError  = "error: no id was given"
+	InvalidIdError     = "error: invalid id was given"
+)
+
+// Helps
+const (
+	CompleteCommandHelp = "To mark task as complete use: task complete <task_id>"
 )

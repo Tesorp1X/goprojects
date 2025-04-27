@@ -194,6 +194,21 @@ func (s *CsvStorage) clearAll() {
 }
 
 func (s *CsvStorage) DeleteNote(noteId int) error {
+	if found, _ := lookForId(s.rawData, noteId); !found {
+		s.appSettings.Logger.Fatalf("Failed to find ID: %d", noteId)
+		return errors.New(models.IdNotFoundError)
+	}
+	for _, line := range s.rawData[1:] {
+		note, _ := NewNoteFromRawData(line)
+		if note.id != noteId {
+			s.stagedData = append(s.stagedData, note)
+		}
+	}
+	s.clearAll()
+	if err := s.flush(); err != nil {
+		return err
+	}
+	s.appSettings.Logger.Printf("Deleted note with id: %d", noteId)
 	return nil
 }
 

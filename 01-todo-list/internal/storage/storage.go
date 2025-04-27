@@ -182,6 +182,17 @@ func (s *CsvStorage) GetNotesList() ([]Note, error) {
 	return notes, nil
 }
 
+func (s *CsvStorage) clearAll() {
+	if err := s.storageFile.Truncate(0); err != nil {
+		s.appSettings.Logger.Fatalf("Failed to truncate: %v", err)
+	}
+	s.rawData = [][]string{CSV_HEADERS}
+	if _, err := s.storageFile.WriteString(strings.Join(CSV_HEADERS, ",")); err != nil {
+		s.appSettings.Logger.Fatalf("Failed to write to csv file: %v", err)
+	}
+
+}
+
 func (s *CsvStorage) DeleteNote(noteId int) error {
 	return nil
 }

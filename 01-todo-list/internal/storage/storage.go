@@ -189,8 +189,9 @@ func (s *CsvStorage) clearAll() {
 	if err := s.storageFile.Truncate(0); err != nil {
 		s.appSettings.Logger.Fatalf("Failed to truncate: %v", err)
 	}
+	s.storageFile.Seek(0, 0)
 	s.rawData = [][]string{CSV_HEADERS}
-	if _, err := s.storageFile.WriteString(strings.Join(CSV_HEADERS, ",")); err != nil {
+	if _, err := s.storageFile.WriteString(strings.Join(CSV_HEADERS, ",") + "\n"); err != nil {
 		s.appSettings.Logger.Fatalf("Failed to write to csv file: %v", err)
 	}
 

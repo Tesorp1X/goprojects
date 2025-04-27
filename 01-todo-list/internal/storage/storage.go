@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/Tesorp1X/goprojects/01-todo-list/internal/models"
@@ -182,6 +183,8 @@ func (s *CsvStorage) GetNotesList() ([]Note, error) {
 	return notes, nil
 }
 
+// Helper muthod, that clears all data from [storageFile] and pushes
+// [CSV_HEADERS] back in the file. Also clears [rawData].
 func (s *CsvStorage) clearAll() {
 	if err := s.storageFile.Truncate(0); err != nil {
 		s.appSettings.Logger.Fatalf("Failed to truncate: %v", err)
@@ -193,6 +196,8 @@ func (s *CsvStorage) clearAll() {
 
 }
 
+// Deletes a note with given [noteId]. Returns a [IdNotFoundError] if
+// note was note found in the file.
 func (s *CsvStorage) DeleteNote(noteId int) error {
 	if found, _ := lookForId(s.rawData, noteId); !found {
 		s.appSettings.Logger.Fatalf("Failed to find ID: %d", noteId)
@@ -213,6 +218,7 @@ func (s *CsvStorage) DeleteNote(noteId int) error {
 }
 
 func (s *CsvStorage) AlterNote(newNote Note) error {
+
 	return nil
 }
 

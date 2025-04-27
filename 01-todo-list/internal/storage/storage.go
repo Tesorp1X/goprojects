@@ -161,7 +161,7 @@ func lookForId(data [][]string, id int) (found bool, noteRaw []string) {
 func (s *CsvStorage) GetNote(noteId int) (*Note, error) {
 	found, noteRaw := lookForId(s.rawData, noteId)
 	if !found {
-		return nil, errors.New(models.IdOutOfRangeError)
+		return nil, errors.New(models.IdNotFoundError)
 	}
 
 	return NewNoteFromRawData(noteRaw)

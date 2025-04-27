@@ -104,10 +104,13 @@ func (s *CsvStorage) flush() error {
 
 		err := w.Write([]string{id, note.data, timeStamp, status})
 		if err != nil {
+			s.appSettings.Logger.Fatalf("Failed to flush csv file: %v", err)
 			return err
 		}
+		s.appSettings.Logger.Printf("Note saved: {ID:%s,Data:%s,TimeStamp:%s,Status:%s}",
+			id, note.data, timeStamp, status)
 	}
-
+	s.appSettings.Logger.Println("Flush successful")
 	return nil
 }
 

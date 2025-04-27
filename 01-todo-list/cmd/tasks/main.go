@@ -38,7 +38,7 @@ func main() {
 
 	//Init storage
 	storageFile, err := os.OpenFile(STD_STORAGE_FILE_DIR+STD_STORAGE_FILE_NAME+CSV_FILE_SUFFIX,
-		os.O_APPEND|os.O_CREATE|os.O_RDWR, 0644)
+		os.O_CREATE|os.O_RDWR, 0644)
 
 	if err != nil {
 		fmt.Fprintln(appSettings.ErrFile, "Storage file is missing")
@@ -79,12 +79,22 @@ func main() {
 			fmt.Fprintln(appSettings.OutFile, models.CompleteCommandHelp)
 			return
 		}
-		taskId, err := strconv.ParseInt(args[3], 10, 0)
+		taskId, err := strconv.ParseInt(args[2], 10, 0)
 		if err != nil {
 			fmt.Println(appSettings.ErrFile, models.InvalidIdError)
 			return
 		}
 		commands.CompleteCommand(csvStorage, int(taskId))
+	case "delete", "remove", "-r":
+		// task delete <taskId>
+		// task remove <taskId>
+		// task -r <taskId>
+		taskId, err := strconv.ParseInt(args[2], 10, 0)
+		if err != nil {
+			fmt.Println(appSettings.ErrFile, models.InvalidIdError)
+			return
+		}
+		commands.DeleteCommand(csvStorage, int(taskId))
 	default:
 		fmt.Fprintf(appSettings.ErrFile, "Error: unknown command %s", command)
 	}

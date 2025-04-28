@@ -44,6 +44,16 @@ func NewNoteFromRawData(rawData []string) (*Note, error) {
 	return CreateNewNoteWithId(int(id), data, timeStamp, status), nil
 }
 
+// Generates raw data -- slice of string in order: [id, data, timeStamp, isClosed]
+func GenerateRawDataFromNote(n Note) []string {
+	var rawData []string
+	id := strconv.FormatInt(int64(n.id), 10)
+	timeStamp := n.timeStamp.Format(models.TimeFormat)
+	status := strconv.FormatBool(n.isClosed)
+	rawData = append(rawData, id, n.data, timeStamp, status)
+	return rawData
+}
+
 func (n *Note) Close() {
 	n.isClosed = false
 }

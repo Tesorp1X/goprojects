@@ -1,4 +1,5 @@
-package storage
+// Tests for exportable functions and methods
+package tests
 
 import (
 	"bytes"
@@ -96,7 +97,7 @@ func TestGetNote(t *testing.T) {
 	})
 	t.Run("wrong id error", func(t *testing.T) {
 		_, err := csvStorage.GetNote(10000)
-		wantedErr := models.IdOutOfRangeError
+		wantedErr := models.IdNotFoundError
 
 		if err == nil {
 			t.Errorf("expected an error (%s), but got nothing", wantedErr)

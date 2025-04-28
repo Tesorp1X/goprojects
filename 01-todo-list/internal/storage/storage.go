@@ -38,7 +38,7 @@ func NewNoteFromRawData(rawData []string) (*Note, error) {
 	data := rawData[1]
 	timeStamp, errTime := time.Parse(models.TimeFormat, rawData[2])
 	status, errStatus := strconv.ParseBool(rawData[3])
-	if errId != nil && errTime != nil && errStatus != nil {
+	if errId != nil || errTime != nil || errStatus != nil {
 		return nil, errors.New(models.WrongNoteDataError)
 	}
 	return CreateNewNoteWithId(int(id), data, timeStamp, status), nil

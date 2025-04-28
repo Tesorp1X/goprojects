@@ -208,7 +208,9 @@ func (s *CsvStorage) clearAll() {
 }
 
 // Deletes a note with given [noteId]. Returns a [IdNotFoundError] if
-// note was note found in the file.
+// note was note found in the file. Method will delete all data from the file,
+//
+//	and rewrite altered data (without note with given id).
 func (s *CsvStorage) DeleteNote(noteId int) error {
 	if found, _ := lookForId(s.rawData, noteId); !found {
 		s.appSettings.Logger.Fatalf("Failed to find ID: %d", noteId)
@@ -228,6 +230,8 @@ func (s *CsvStorage) DeleteNote(noteId int) error {
 	return nil
 }
 
+// AlterNote recieves a note and updates csv-file with new data.
+// Returns whatever error, that happens during clearAll or flush method calls.
 func (s *CsvStorage) AlterNote(newNote Note) error {
 
 	return nil

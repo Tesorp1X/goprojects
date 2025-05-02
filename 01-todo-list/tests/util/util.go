@@ -38,3 +38,15 @@ func AssertEqualRawData(a, b [][]string) bool {
 
 	return true
 }
+
+// Cleans a file f and closess it. Returns whatever error occured during that process.
+func CleanFile(f *os.File) error {
+	defer f.Close()
+	if err := f.Truncate(0); err != nil {
+		return err
+	}
+	if _, err := f.Seek(0, 0); err != nil {
+		return err
+	}
+	return nil
+}

@@ -49,11 +49,16 @@ func ListCommand(s storage.Storage, allFlag bool) {
 func CompleteCommand(s storage.Storage, id int) {
 	note, err := s.GetNote(id)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error: %s", err.Error())
 		// TODO logging
+		fmt.Fprintf(os.Stderr, "Task with id %d not found.\n", id)
 		return
 	}
 	note.Close()
+	err = s.AlterNote(*note)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Task with id %d not found.\n", id)
+		return
+	}
 	fmt.Fprintln(os.Stdout, "Task closed.")
 }
 

@@ -30,7 +30,7 @@ func TestNewNoteFromRawData(t *testing.T) {
 		wantedNote.SetTime(newTime)
 		wantedNote.SetStatus(true)
 
-		if !util.AssertNotes(t, *gotNote, wantedNote) {
+		if !util.AssertEqualNotes(*gotNote, wantedNote) {
 			//add note.String() after it's complete
 			t.Error("Notes are not the same.")
 		}

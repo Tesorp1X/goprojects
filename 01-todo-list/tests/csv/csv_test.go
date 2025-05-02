@@ -13,6 +13,7 @@ import (
 
 	"github.com/Tesorp1X/goprojects/01-todo-list/internal/models"
 	"github.com/Tesorp1X/goprojects/01-todo-list/internal/storage"
+	"github.com/Tesorp1X/goprojects/01-todo-list/tests/util"
 )
 
 func TestCsvSave(t *testing.T) {
@@ -30,14 +31,15 @@ func TestCsvSave(t *testing.T) {
 		defer testCsvFile.Close()
 		defer os.Remove(testCsvFile.Name())
 
-		testCsvData := `ID,Description,CreatedAt,IsComplete
-1,My new task,2024-07-27T16:45:19-05:00,true
-2,Finish this video,2024-07-27T16:45:26-05:00,true
-3,Find a video editor,2024-07-27T16:45:31-05:00,false`
+		testCsvData := `ID,Task,Created,Done
+1,My new task,2025-04-26 03:05:39 +0700 +07,true
+2,Finish this video,2025-04-26 03:05:39 +0700 +07,true
+3,Find a video editor,2025-04-26 03:05:39 +0700 +07,false`
 
-		if _, err := testCsvFile.Write([]byte(testCsvData)); err != nil {
+		if _, err := testCsvFile.WriteString(testCsvData); err != nil {
 			t.Fatal(err)
 		}
+
 		csvStorage, _ := storage.NewCsvStorage(testCsvFile, settings)
 		csvStorage.Save("test this thing")
 		gotBytes := make([]byte, 512)
@@ -55,18 +57,6 @@ func TestCsvSave(t *testing.T) {
 }
 
 func TestGetNote(t *testing.T) {
-	compareNotes := func(a, b *storage.Note) bool {
-		idComp := a.GetId() != b.GetId()
-		dataComp := strings.Compare(a.GetData(), b.GetData())
-		timeComp := strings.Compare(a.GetTimeStamp().Format(models.TimeFormat), b.GetTimeStamp().Format(models.TimeFormat))
-		statusComp := a.IsClosed() == b.IsClosed()
-		if idComp || dataComp != 0 ||
-			timeComp != 0 ||
-			!statusComp {
-			return false
-		}
-		return true
-	}
 	outputBuff := &bytes.Buffer{}
 	errBuff := &bytes.Buffer{}
 	logBuff := &bytes.Buffer{}
@@ -89,7 +79,7 @@ func TestGetNote(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		if !compareNotes(note, wantedNote) {
+		if !util.AssertNotes(t, *note, *wantedNote) {
 			t.Error("notes doesnt match")
 		}
 	})

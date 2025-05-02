@@ -1,4 +1,4 @@
-package storage
+package storage_test
 
 import (
 	"strings"
@@ -6,21 +6,9 @@ import (
 	"time"
 
 	"github.com/Tesorp1X/goprojects/01-todo-list/internal/models"
+	"github.com/Tesorp1X/goprojects/01-todo-list/internal/storage"
+	"github.com/Tesorp1X/goprojects/01-todo-list/tests/util"
 )
-
-func assertNotes(t *testing.T, a, b Note) bool {
-	t.Helper()
-	idComp := a.GetId() != b.GetId()
-	dataComp := strings.Compare(a.GetData(), b.GetData())
-	timeComp := strings.Compare(a.GetTimeStamp().Format(models.TimeFormat), b.GetTimeStamp().Format(models.TimeFormat))
-	statusComp := a.IsClosed() == b.IsClosed()
-	if idComp || dataComp != 0 ||
-		timeComp != 0 ||
-		!statusComp {
-		return false
-	}
-	return true
-}
 
 func TestNewNoteFromRawData(t *testing.T) {
 	t.Run("good data", func(t *testing.T) {
@@ -30,19 +18,19 @@ func TestNewNoteFromRawData(t *testing.T) {
 		statusStr := "true"
 		goodData := []string{idStr, dataStr, newTime.Format(models.TimeFormat), statusStr}
 
-		gotNote, err := NewNoteFromRawData(goodData)
+		gotNote, err := storage.NewNoteFromRawData(goodData)
 		if err != nil {
 			t.Errorf("didn't expect an error, but got: %v", err)
 		}
 
-		var wantedNote Note
+		var wantedNote storage.Note
 
 		wantedNote.SetId(1)
 		wantedNote.SetData(dataStr)
 		wantedNote.SetTime(newTime)
 		wantedNote.SetStatus(true)
 
-		if !assertNotes(t, *gotNote, wantedNote) {
+		if !util.AssertNotes(t, *gotNote, wantedNote) {
 			//add note.String() after it's complete
 			t.Error("Notes are not the same.")
 		}
@@ -54,7 +42,7 @@ func TestNewNoteFromRawData(t *testing.T) {
 		statusStr := "true"
 		badData := []string{idStr, dataStr, newTime.Format(models.TimeFormat), statusStr}
 
-		_, err := NewNoteFromRawData(badData)
+		_, err := storage.NewNoteFromRawData(badData)
 
 		if err == nil {
 			t.Error("expected an error, but got non")

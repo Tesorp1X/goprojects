@@ -3,9 +3,11 @@ package tests
 
 import (
 	"bytes"
-	"io"
+	"encoding/csv"
+	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -17,42 +19,131 @@ import (
 )
 
 func TestCsvSave(t *testing.T) {
-	t.Run("ordinary note", func(t *testing.T) {
-		outputBuff := &bytes.Buffer{}
-		errBuff := &bytes.Buffer{}
-		logBuff := &bytes.Buffer{}
-		logger := log.New(logBuff, "TEST: ", log.Ldate|log.Ltime)
-		settings := models.InitSettings(outputBuff, errBuff, logger)
+	rawDataToStr := func(data [][]string) string {
+		t.Helper()
+		var str string
+		for _, row := range data {
+			str += fmt.Sprintf("%s\n", strings.Join(row, ","))
+		}
+		return str
+	}
 
-		testCsvFile, err := os.CreateTemp(".", "test.csv")
+	var testCsvData [][]string
+	testCsvData = append(testCsvData, []string{"ID", "Task", "Created", "Done"})
+	testCsvData = append(testCsvData, []string{"1", "My new task", "2025-04-26 03:05:39 +0700 +07", "true"})
+	testCsvData = append(testCsvData, []string{"2", "Finish this video", "2025-04-26 03:05:39 +0700 +07", "true"})
+	testCsvData = append(testCsvData, []string{"3", "Find a video editor", "2025-04-26 03:05:39 +0700 +07", "false"})
+
+	prepareFile := func(fileName string) {
+		t.Helper()
+		f, err := os.OpenFile(fileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 		if err != nil {
 			t.Fatal(err)
 		}
+		defer f.Close()
+
+		writer := csv.NewWriter(f)
+		if err := writer.WriteAll(testCsvData); err != nil {
+			t.Fatal(err)
+		}
+		writer.Flush()
+	}
+
+	saveNewNote := func(fileName string, taskStr string, testCsvData [][]string, settings *models.Settings) (expectedData [][]string) {
+		testCsvFile, err := os.OpenFile(fileName, os.O_CREATE|os.O_RDWR, 0644)
+		if err != nil {
+			t.Fatal(err)
+		}
+		// Closing a file so data gets saved
 		defer testCsvFile.Close()
-		defer os.Remove(testCsvFile.Name())
 
-		testCsvData := `ID,Task,Created,Done
-1,My new task,2025-04-26 03:05:39 +0700 +07,true
-2,Finish this video,2025-04-26 03:05:39 +0700 +07,true
-3,Find a video editor,2025-04-26 03:05:39 +0700 +07,false`
+		csvStorage, _ := storage.NewCsvStorage(testCsvFile, settings)
+		csvStorage.Save(taskStr)
+		noteId, _ := csvStorage.GetLastId()
+		noteId++
+		moment := time.Now().Format(models.TimeFormat)
 
-		if _, err := testCsvFile.WriteString(testCsvData); err != nil {
+		expectedData = append(testCsvData, []string{strconv.FormatInt(int64(noteId), 10), taskStr, moment, "false"})
+		return
+	}
+
+	outputBuff := &bytes.Buffer{}
+	errBuff := &bytes.Buffer{}
+	logBuff := &bytes.Buffer{}
+	logger := log.New(logBuff, "TEST: ", log.Ldate|log.Ltime)
+	settings := models.InitSettings(outputBuff, errBuff, logger)
+
+	t.Run("ordinary note", func(t *testing.T) {
+
+		//Opens a file and puts [testCsvData] in to it
+		prepareFile("test_empty.csv")
+
+		//Saving new note
+		expectedData := saveNewNote("test_empty.csv", "test that thing", testCsvData, settings)
+		// Assertion
+		testCsvFile, err := os.OpenFile("test_empty.csv", os.O_CREATE|os.O_RDWR, 0644)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer util.CleanFile(testCsvFile)
+
+		reader := csv.NewReader(testCsvFile)
+		gotData, err := reader.ReadAll()
+		if err != nil {
 			t.Fatal(err)
 		}
 
-		csvStorage, _ := storage.NewCsvStorage(testCsvFile, settings)
-		csvStorage.Save("test this thing")
-		gotBytes := make([]byte, 512)
-		_, errB := testCsvFile.Read(gotBytes)
-		if errB != nil && errB != io.EOF {
-			t.Fatal(errB)
+		if !util.AssertEqualRawData(expectedData, gotData) {
+			t.Errorf("\nEXPECTED:\n%s \nGOT:\n%s", rawDataToStr(expectedData), rawDataToStr(gotData))
+		}
+	})
+	t.Run("note has ',' in noteStr", func(t *testing.T) {
+		//Opens a file and puts [testCsvData] in to it
+		prepareFile("test_empty.csv")
+
+		//Saving new note
+		expectedData := saveNewNote("test_empty.csv", "test, this, thing", testCsvData, settings)
+
+		// Assertion
+		testCsvFile, err := os.OpenFile("test_empty.csv", os.O_CREATE|os.O_RDWR, 0644)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer util.CleanFile(testCsvFile)
+
+		reader := csv.NewReader(testCsvFile)
+		gotData, err := reader.ReadAll()
+		if err != nil {
+			t.Fatal(err)
 		}
 
-		expected := testCsvData + "\n4,test this thing," + time.Now().Format(models.TimeFormat) + ",false"
-		if c := strings.Compare(string(gotBytes), expected); c != 0 {
-			t.Errorf("expected %s got %s", expected, string(gotBytes))
+		if !util.AssertEqualRawData(expectedData, gotData) {
+			t.Errorf("\nEXPECTED:\n%s \nGOT:\n%s", rawDataToStr(expectedData), rawDataToStr(gotData))
+		}
+	})
+	t.Run("first note", func(t *testing.T) {
+		var data [][]string
+		data = append(data, storage.CSV_HEADERS)
+
+		//Saving new note
+		expectedData := saveNewNote("test_empty.csv", "test, this, thing", data, settings)
+
+		// Assertion
+		testCsvFile, err := os.OpenFile("test_empty.csv", os.O_CREATE|os.O_RDWR, 0644)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer util.CleanFile(testCsvFile)
+
+		reader := csv.NewReader(testCsvFile)
+		gotData, err := reader.ReadAll()
+		if err != nil {
+			t.Fatal(err)
 		}
 
+		if !util.AssertEqualRawData(expectedData, gotData) {
+			t.Errorf("\nEXPECTED:\n%s \nGOT:\n%s", rawDataToStr(expectedData), rawDataToStr(gotData))
+		}
 	})
 }
 
@@ -79,7 +170,7 @@ func TestGetNote(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		if !util.AssertNotes(t, *note, *wantedNote) {
+		if !util.AssertEqualNotes(*note, *wantedNote) {
 			t.Error("notes doesnt match")
 		}
 	})

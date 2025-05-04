@@ -21,10 +21,11 @@ const (
 
 // Errors
 const (
-	IdNotFoundError    = "error: given id not found"
-	WrongNoteDataError = "error: couldn't create new note, because wrong data was given"
-	NoIdWasGivenError  = "error: no id was given"
-	InvalidIdError     = "error: invalid id was given"
+	IdNotFoundError         = "error: given id not found"
+	WrongNoteDataError      = "error: couldn't create new note, because wrong data was given"
+	NoIdWasGivenError       = "error: no id was given"
+	InvalidIdError          = "error: invalid id was given"
+	SomethingWentWrongError = "error: something went wrong"
 )
 
 // Helps

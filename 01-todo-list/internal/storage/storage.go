@@ -250,7 +250,19 @@ func (s *CsvStorage) DeleteNote(noteId int) error {
 // AlterNote recieves a note and updates csv-file with new data.
 // Returns whatever error, that happens during clearAll or flush method calls.
 func (s *CsvStorage) AlterNote(newNote Note) error {
+	for _, row := range s.rawData[1:] {
+		currentId, _ := strconv.ParseInt(row[0], 10, 0)
+		if currentId == int64(newNote.id) {
+			s.stagedData = append(s.stagedData, &newNote)
+		} else {
+			n, _ := NewNoteFromRawData(row)
+			s.stagedData = append(s.stagedData, n)
+		}
+	}
+	s.clearAll()
+	if err := s.flush(); err != nil {
 
+	}
 	return nil
 }
 

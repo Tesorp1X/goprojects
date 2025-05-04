@@ -57,6 +57,14 @@ func GenerateRawDataFromNote(n Note) []string {
 	return rawData
 }
 
+// Converts note to string like that: {ID: 1; Data: test task; Created at: 2006-01-02 15:04:05 -0700 MST; Done: true}
+func (n Note) String() string {
+	var res string
+	timeStamp := n.timeStamp.Format(models.TimeFormat)
+	res = fmt.Sprintf("{ID: %d; Data: %s; Created at: %s; Done: %t}", n.id, n.data, timeStamp, n.isClosed)
+	return res
+}
+
 func (n *Note) Close() {
 	n.isClosed = false
 }

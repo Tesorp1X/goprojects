@@ -22,20 +22,21 @@ func AssertEqualNotes(a, b storage.Note) bool {
 	return true
 }
 
+// Returns true if a[i][j] == b[i][j] for any acceptable i and j.
 func AssertEqualRawData(a, b [][]string) bool {
-	if len(a) != len(b) {
-		return false
-	}
-
 	if a == nil || b == nil {
 		return false
 	}
 
+	if len(a) != len(b) {
+		return false
+	}
+
 	for i := 0; i < len(a); i++ {
-		if len(a[i]) != len(b[i]) {
+		if a[i] == nil || b[i] == nil {
 			return false
 		}
-		if a[i] == nil || b[i] == nil {
+		if len(a[i]) != len(b[i]) {
 			return false
 		}
 		for j := 0; j < len(a[i]); j++ {

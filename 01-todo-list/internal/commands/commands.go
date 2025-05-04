@@ -38,7 +38,7 @@ func ListCommand(s storage.Storage, allFlag bool) {
 		fmt.Fprintf(w, "|%d\t%s\t%s\t%t\t|\n",
 			note.GetId(),
 			note.GetData(),
-			note.GetTimeStamp().String(),
+			note.GetTimeStamp().Format(models.TimeFormat),
 			note.IsClosed(),
 		)
 

@@ -67,7 +67,7 @@ func (n Note) String() string {
 }
 
 func (n *Note) Close() {
-	n.isClosed = false
+	n.isClosed = true
 }
 
 func (n Note) GetId() int {

@@ -1,3 +1,4 @@
+// test of helper-functions from strorage.go
 package storage_test
 
 import (

@@ -19,6 +19,7 @@ type Storage interface {
 	DeleteNote(int) error
 	AlterNote(Note) error
 	GetLastId() (int, error)
+	GetSettings() *models.Settings
 }
 
 type Note struct {
@@ -135,6 +136,10 @@ func (s *CsvStorage) flush() error {
 	}
 	s.appSettings.Logger.Println("Flush successful")
 	return nil
+}
+
+func (s *CsvStorage) GetSettings() *models.Settings {
+	return s.appSettings
 }
 
 func NewCsvStorage(file *os.File, settings *models.Settings) (*CsvStorage, error) {

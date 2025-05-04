@@ -33,6 +33,9 @@ func CreateNewNoteWithId(id int, taskStr string, timeStamp time.Time, status boo
 	return &Note{id: id, data: taskStr, timeStamp: timeStamp, isClosed: status}
 }
 
+// Creates a [Note] from raw data.
+// [rawData] must be in format: ["number", "string", "models.TimeFormat", "bool"],
+// otherwise returns a [WrongNoteDataError].
 func NewNoteFromRawData(rawData []string) (*Note, error) {
 	id, errId := strconv.ParseInt(rawData[0], 10, 0)
 	data := rawData[1]
@@ -102,6 +105,7 @@ type CsvStorage struct {
 	stagedData  []*Note // data to save. Must call .flush() to save it
 }
 
+// Writes [stagedData] to [storageFile].
 func (s *CsvStorage) flush() error {
 	if len(s.stagedData) == 0 {
 		return nil

@@ -2,10 +2,10 @@ package commands
 
 import (
 	"fmt"
-	"text/tabwriter"
 
 	"github.com/Tesorp1X/goprojects/01-todo-list/internal/models"
 	"github.com/Tesorp1X/goprojects/01-todo-list/internal/storage"
+	"github.com/aquasecurity/table"
 )
 
 func AddCommand(s storage.Storage, task string) {
@@ -19,31 +19,35 @@ func AddCommand(s storage.Storage, task string) {
 }
 
 func ListCommand(s storage.Storage, allFlag bool) {
-	notesList, err := s.GetNotesList()
+	//Table setup
+	t := table.New(s.GetSettings().OutFile)
+	t.SetRowLines(true)
+	t.SetHeaders("ID", "Task", "Created at", "Done")
+	t.SetAlignment(table.AlignRight, table.AlignCenter, table.AlignRight)
+	t.SetDividers(table.UnicodeRoundedDividers)
+
+	notes, err := s.GetNotesList()
 	if err != nil {
-		fmt.Fprintf(s.GetSettings().ErrFile, "error: %s", err.Error())
-		s.GetSettings().Logger.Fatalf("error: %s", err.Error())
+		s.GetSettings().Logger.Fatalf("Failed to retrieve a list from storage")
+		fmt.Fprintln(s.GetSettings().ErrFile, models.SomethingWentWrongError)
 		return
 	}
-	minwidth := 5         // minimal cell width including any padding
-	tabwidth := 8         // width of tab characters (equivalent number of spaces)
-	padding := 1          // padding added to a cell before computing its width
-	padchar := byte('\t') // ASCII char used for padding
-	w := tabwriter.NewWriter(s.GetSettings().OutFile, minwidth, tabwidth, padding, padchar, tabwriter.AlignRight)
-	fmt.Fprint(w, "|ID\tTask\tCreated\tDone\t|\n")
-	for _, note := range notesList {
+	for _, note := range notes {
+		//	If command was called without flag -a and
+		// task is complete it will not show.
 		if note.IsClosed() && !allFlag {
 			continue
 		}
-		fmt.Fprintf(w, "|%d\t%s\t%s\t%t\t|\n",
-			note.GetId(),
-			note.GetData(),
-			note.GetTimeStamp().Format(models.TimeFormat),
-			note.IsClosed(),
-		)
 
+		completed := "❌"
+		if note.IsClosed() {
+			completed = "✔️"
+		}
+		rawNote := storage.GenerateRawDataFromNote(note)
+		rawNote[3] = completed // setting  [Done] col value to emoji ✔️ or ❌
+		t.AddRow(rawNote...)
 	}
-	w.Flush()
+	t.Render()
 }
 
 func CompleteCommand(s storage.Storage, id int) {

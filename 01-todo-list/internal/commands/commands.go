@@ -26,6 +26,8 @@ func ListCommand(s storage.Storage, allFlag bool) {
 	t.SetHeaders("ID", "Task", "Created at", "Done")
 	t.SetAlignment(table.AlignRight, table.AlignRight, table.AlignRight)
 	t.SetDividers(table.UnicodeRoundedDividers)
+	t.SetLineStyle(table.StyleCyan)
+	t.SetHeaderStyle(table.StyleBold)
 
 	notes, err := s.GetNotesList()
 	if err != nil {

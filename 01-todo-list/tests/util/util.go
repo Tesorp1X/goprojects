@@ -2,7 +2,6 @@ package util
 
 import (
 	"os"
-	"strings"
 
 	"github.com/Tesorp1X/goprojects/01-todo-list/internal/models"
 	"github.com/Tesorp1X/goprojects/01-todo-list/internal/storage"
@@ -11,11 +10,11 @@ import (
 // Returns true if both notes are identical
 func AssertEqualNotes(a, b storage.Note) bool {
 	idComp := a.GetId() != b.GetId()
-	dataComp := strings.Compare(a.GetData(), b.GetData())
-	timeComp := strings.Compare(a.GetTimeStamp().Format(models.TimeFormat), b.GetTimeStamp().Format(models.TimeFormat))
+	dataComp := a.GetData() != b.GetData()
+	timeComp := a.GetTimeStamp().Format(models.TimeFormat) != b.GetTimeStamp().Format(models.TimeFormat)
 	statusComp := a.IsClosed() == b.IsClosed()
-	if idComp || dataComp != 0 ||
-		timeComp != 0 ||
+	if idComp || dataComp ||
+		timeComp ||
 		!statusComp {
 		return false
 	}
@@ -40,7 +39,7 @@ func AssertEqualRawData(a, b [][]string) bool {
 			return false
 		}
 		for j := 0; j < len(a[i]); j++ {
-			if strings.Compare(a[i][j], b[i][j]) != 0 {
+			if a[i][j] != b[i][j] {
 				return false
 			}
 		}

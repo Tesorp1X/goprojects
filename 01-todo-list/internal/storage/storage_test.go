@@ -2,7 +2,6 @@
 package storage_test
 
 import (
-	"strings"
 	"testing"
 	"time"
 
@@ -48,7 +47,7 @@ func TestNewNoteFromRawData(t *testing.T) {
 		if err == nil {
 			t.Error("expected an error, but got non")
 		}
-		if strings.Compare(err.Error(), models.WrongNoteDataError) != 0 {
+		if err.Error() != models.WrongNoteDataError {
 			t.Errorf("expected models.WrongNoteDataError, but got: %v", err)
 		}
 	})

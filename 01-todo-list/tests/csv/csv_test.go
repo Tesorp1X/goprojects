@@ -188,7 +188,7 @@ func TestGetNote(t *testing.T) {
 			t.Errorf("expected an error (%s), but got nothing", wantedErr)
 		}
 
-		if strings.Compare(err.Error(), wantedErr) != 0 {
+		if err.Error() != wantedErr {
 			t.Errorf("expected: '%s' got: '%s'", wantedErr, err)
 		}
 	})

@@ -43,7 +43,7 @@ func prepareFile(t testing.TB, fileName string, testCsvData [][]string) {
 	writer.Flush()
 }
 
-func TestCsvSave(t *testing.T) {
+func TestSave(t *testing.T) {
 
 	var testCsvData [][]string
 	testCsvData = append(testCsvData, []string{"ID", "Task", "Created", "Done"})

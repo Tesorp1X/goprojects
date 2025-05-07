@@ -69,7 +69,7 @@ func TestCsvSave(t *testing.T) {
 		noteId++
 		moment := time.Now().Format(models.TimeFormat)
 
-		expectedData = append(testCsvData, []string{strconv.FormatInt(int64(noteId), 10), taskStr, moment, "false"})
+		expectedData = append(testCsvData, []string{strconv.Itoa(noteId), taskStr, moment, "false"})
 		return
 	}
 

@@ -51,7 +51,7 @@ func NewNoteFromRawData(rawData []string) (*Note, error) {
 // Generates raw data -- slice of string in order: [id, data, timeStamp, isClosed]
 func GenerateRawDataFromNote(n Note) []string {
 	var rawData []string
-	id := strconv.FormatInt(int64(n.id), 10)
+	id := strconv.Itoa(n.id)
 	timeStamp := n.timeStamp.Format(models.TimeFormat)
 	status := strconv.FormatBool(n.isClosed)
 	rawData = append(rawData, id, n.data, timeStamp, status)
@@ -122,7 +122,7 @@ func (s *CsvStorage) flush() error {
 	w := csv.NewWriter(s.storageFile)
 	defer w.Flush()
 	for _, note := range s.stagedData {
-		id := strconv.FormatInt(int64(note.id), 10)
+		id := strconv.Itoa(note.id)
 		timeStamp := note.timeStamp.Format(models.TimeFormat)
 		status := strconv.FormatBool(note.isClosed)
 

@@ -6,6 +6,7 @@ import (
 	"github.com/Tesorp1X/goprojects/01-todo-list/internal/models"
 	"github.com/Tesorp1X/goprojects/01-todo-list/internal/storage"
 	"github.com/aquasecurity/table"
+	"github.com/mergestat/timediff"
 )
 
 func AddCommand(s storage.Storage, task string) {
@@ -23,7 +24,7 @@ func ListCommand(s storage.Storage, allFlag bool) {
 	t := table.New(s.GetSettings().OutFile)
 	t.SetRowLines(true)
 	t.SetHeaders("ID", "Task", "Created at", "Done")
-	t.SetAlignment(table.AlignRight, table.AlignCenter, table.AlignRight)
+	t.SetAlignment(table.AlignRight, table.AlignRight, table.AlignRight)
 	t.SetDividers(table.UnicodeRoundedDividers)
 
 	notes, err := s.GetNotesList()
@@ -44,7 +45,8 @@ func ListCommand(s storage.Storage, allFlag bool) {
 			completed = "✔️"
 		}
 		rawNote := storage.GenerateRawDataFromNote(note)
-		rawNote[3] = completed // setting  [Done] col value to emoji ✔️ or ❌
+		rawNote[2] = timediff.TimeDiff(note.GetTimeStamp()) // setting [Created at] to a human readable, relative time differences
+		rawNote[3] = completed                              // setting  [Done] col value to emoji ✔️ or ❌
 		t.AddRow(rawNote...)
 	}
 	t.Render()

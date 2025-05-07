@@ -2,6 +2,7 @@
 package storage_test
 
 import (
+	"slices"
 	"testing"
 	"time"
 
@@ -51,4 +52,21 @@ func TestNewNoteFromRawData(t *testing.T) {
 			t.Errorf("expected models.WrongNoteDataError, but got: %v", err)
 		}
 	})
+}
+
+func TestGenerateRawDataFromNote(t *testing.T) {
+	// Set data
+	note := storage.Note{}
+	note.SetId(1)
+	testTime := time.Now()
+	note.SetData("test task")
+	note.SetTime(testTime)
+	note.SetStatus(true)
+
+	got := storage.GenerateRawDataFromNote(note)
+	expected := []string{"1", "test task", testTime.Format(models.TimeFormat), "true"}
+
+	if !slices.Equal(got, expected) {
+		t.Errorf("expected: %v, but got: %v", expected, got)
+	}
 }
